@@ -6,7 +6,7 @@ cClouds::cClouds()
 	mWidth = 0;
 	mHeight = 0;
 }
-cClouds::cClouds(int _posX, int _posY)
+cClouds::cClouds(double _posX,double _posY)
 {
 	posX = _posX;
 	posY = _posY;
@@ -18,30 +18,23 @@ cClouds::~cClouds()
 }
 Uint32 cClouds::movingClouds(Uint32 interval, void* param)
 {
-	/*if (cloud.getX() < (-cloud.getWidth()))
-	{
-		cloud.setX((cloud.getWidth() + 1280 + 600));
-	}
-	//cloud.moveX(-3);*/
-	/*if (posX < -mWidth)
-		posX = mWidth + 1280 + 600;
-	posX = posX - 3;
-	SDL_TimerID timerID = SDL_AddTimer(20, movingClouds);*/
+	
 	cClouds *self = reinterpret_cast<cClouds *>(param);
 	self->MoveClouds();
-	SDL_TimerID timerID = SDL_AddTimer(20, movingClouds,self);
-	return 0;
+	SDL_TimerID timerID = SDL_AddTimer(60, movingClouds,self);
+	return interval;
 }
 
 void cClouds::MoveClouds()
 {
-	posX = posX - 3;
-	if (posX < -(1280))
-		posX = 1280;
+	posX = posX - 0.5;
+		if (posX < (-mWidth))
+			posX = 1200;
+	
 	
 }
 
-cClouds::cClouds(int _posX, int _posY, SDL_Texture& _texture, int _width, int _height)
+cClouds::cClouds(double _posX, double _posY, SDL_Texture& _texture, int _width, int _height)
 {
 	posX = _posX;
 	posY = _posY;
