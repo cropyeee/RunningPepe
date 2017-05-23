@@ -14,30 +14,34 @@
 class LTexture{
 public:
 	LTexture();
-	LTexture(int _posX, int _posY);
+	LTexture(double _posX, double _posY);
 	~LTexture();
 
 	bool loadFromFile(std::string path, Scena &scena);
 
 	void free();
 	void moveX(int dx);
-	void setX(int _posX);
-	void movePolice(int time);
+	void setX(double _posX);
+	static Uint32 PoliceMove(Uint32 interval, void*param);
+	void movePolice();
 
-	void render(int x, int y, Scena &scena);
+	void render(double x, double y, Scena &scena);
 
 	int getWidth();
 	int getHeight();
-	int getX();
-	int getY();
+	double getX();
+	double getY();
+	SDL_Rect* getCollider();
 	SDL_Texture* getTexture();
 protected:
 	SDL_Texture* mTexture;
 
 	int mWidth;
 	int mHeight;
-	int posX;
-	int posY;
+	double posX;
+	double posY;
+	double VelY=0;
+	SDL_Rect Collider;
 	double posPoliceX;
 };
 

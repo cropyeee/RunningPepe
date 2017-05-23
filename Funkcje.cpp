@@ -111,6 +111,5 @@ void close(Scena &scena, LTexture &background, LTexture &police, cCharacter &cha
 
 Uint32 gamelogic(Uint32 interval, void* param)
 {
-	
 	return interval;
 }

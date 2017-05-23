@@ -11,33 +11,6 @@
 #include "cCharacter.h"
 #include "Funkcje.h"
 
-/*SDL_Texture* loadTexture(std::string path)
-{
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-	}
-	else
-	{
-		//Create texture from surface pixels
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL)
-		{
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return newTexture;
-}*/
-
 
 int main(int argc, char* args[])
 {
@@ -64,39 +37,56 @@ int main(int argc, char* args[])
 		{
 			cClouds cloud1(600, 120,*cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
 			cClouds cloud2(205, 49, *cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
+			cClouds cloud3(1301, 30, *cloud.getTexture(), cloud.getWidth(), cloud.getHeight());
 			/*std::vector<cClouds> vecClouds;
 			vecClouds.push_back(cloud);
 			vecClouds.push_back(cloud1);
 			vecClouds.push_back(cloud2);*/
 			bool quit = false; //Main loop flag
 			SDL_Event e; //Event handler
-			/*SDL_TimerID timerID = SDL_AddTimer(5, cClouds::movingClouds, &cloud);
-			SDL_TimerID timerID1 = SDL_AddTimer(5, cClouds::movingClouds, &cloud1);
-			SDL_TimerID timerID2 = SDL_AddTimer(5, cClouds::movingClouds, &cloud2);*/
 			while (!quit) // while application is running
 			{
+				
 				while (SDL_PollEvent(&e) != 0)
 				{
-					if (e.type == SDL_QUIT)
+				if (e.type == SDL_QUIT)
 					{
 						quit = true;
 					}
-					else if (e.type == SDL_KEYDOWN)
+					/*else if (e.type == SDL_KEYDOWN)
 					{
-						switch (e.key.keysym.sym)
+						if(e.key.keysym.sym==SDLK_SPACE)
 						{
-						case SDLK_SPACE:
-						{
-							character.jump();
-							std::cout << SDL_GetTicks() << std::endl;
-							break;
-						}
-						}
-					}
+							if (character.returnDown() == false && character.returnUp()==false)
+							{
+								character.changeUp();
+								//SDL_TimerID CharJump = SDL_AddTimer(100, cCharacter::charJump, &character);
+								character.charJump(5, &character);
+								std::cout << "Character jumped!" << std::endl;
+								break; 
+							}
+							else break;
+						}*/
+					character.handleEvent(e); //klikniecie spacji
 				}
+				
+				character.jump();
 
-
-				police.movePolice(SDL_GetTicks());
+			/*	if (SDL_GetTicks() > 5000)
+				{
+					police.PoliceMove(60, &police);
+					cloud.movingClouds(60, &cloud);
+					cloud1.movingClouds(60, &cloud1);
+					cloud2.movingClouds(60, &cloud2);
+					cloud3.movingClouds(60, &cloud3);
+				}*/
+				police.movePolice();
+				cloud.MoveClouds();
+				cloud1.MoveClouds();
+				cloud2.MoveClouds();
+				cloud3.MoveClouds();
+				if (SDL_HasIntersection(character.getCollider(), police.getCollider()))
+					std::cout << "Kolizja" << std::endl;
 				//Clear screen
 				SDL_SetRenderDrawColor(scena.returnRenderer(), 0xFF, 0xFF, 0xFF, 0xFF);
 				SDL_RenderClear(scena.returnRenderer());
@@ -105,6 +95,7 @@ int main(int argc, char* args[])
 				cloud.render(cloud.getX(), cloud.getY(),scena);
 				cloud1.render(cloud1.getX(), cloud1.getY(),scena);
 				cloud2.render(cloud2.getX(), cloud2.getY(),scena);
+				cloud3.render(cloud3.getX(), cloud3.getY(), scena);
 				//renderowanie z wektora [!]
 				/*for (std::vector<cClouds>::iterator it = vecClouds.begin(); it != vecClouds.end(); it++)
 				{
@@ -116,7 +107,9 @@ int main(int argc, char* args[])
 				police.render(police.getX(), police.getY(),scena);
 				SDL_RenderPresent(scena.returnRenderer());
 
+				
 			}
+			
 			/*SDL_RemoveTimer(timerID);
 			SDL_RemoveTimer(timerID1);*/
 		}
