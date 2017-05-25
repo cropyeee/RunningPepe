@@ -6,6 +6,10 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include <string>
+#include "LTexture.h"
+#include "cClouds.h"
+#include "cCharacter.h"
+
 
 
 class Scena{
@@ -17,6 +21,7 @@ public:
 	void createWindow();
 	void createRenderer();
 	void destroyWindow();
+	void gamelogic();
 	void destroyRenderer();
 	int returnScreenWidth();
 	int returnScreenHeight();

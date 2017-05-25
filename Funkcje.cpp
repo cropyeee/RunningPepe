@@ -56,15 +56,20 @@ bool init(Scena &scena)
 }
 
 
-bool loadMedia(Scena &scena, LTexture &background, LTexture &police, cCharacter &character, cClouds &cloud)
+bool loadMedia(Scena &scena, LTexture &background, LTexture &police, cCharacter &character, cClouds &cloud, LTexture &background2)
 {
 	//Loading success flag
 	bool success = true;
 
 	//Load bacground
-	if (!background.loadFromFile("droga1_modified.jpg", scena))
+	if (!background.loadFromFile("droga1_modified_asd21.png", scena))
 	{
 		std::cout << "Failed to load background" << std::endl;
+		success = false;
+	}
+	if (!background2.loadFromFile("droga1_modified_asd2_odbicie1.png",scena))
+	{
+		std::cout << "Failet to load background" << std::endl;
 		success = false;
 	}
 
@@ -78,7 +83,7 @@ bool loadMedia(Scena &scena, LTexture &background, LTexture &police, cCharacter 
 		std::cout << "Failed to load police car" << std::endl;
 		success = false;
 	}
-	if (!cloud.loadFromFile("cloud_modified.png", scena))
+	if (!cloud.loadFromFile("cloud_modified1.png", scena))
 	{
 		std::cout << "Failed to load cloud" << std::endl;
 		success = false;
@@ -91,13 +96,14 @@ bool loadMedia(Scena &scena, LTexture &background, LTexture &police, cCharacter 
 
 
 
-void close(Scena &scena, LTexture &background, LTexture &police, cCharacter &character, cClouds &cloud)
+void close(Scena &scena, LTexture &background, LTexture &police, cCharacter &character, cClouds &cloud, LTexture &background2)
 {
 	//Free loaded image
 	background.free();
 	character.free();
 	police.free();
 	cloud.free();
+	background2.free();
 
 
 	//Destroy Window
@@ -109,8 +115,3 @@ void close(Scena &scena, LTexture &background, LTexture &police, cCharacter &cha
 	SDL_Quit();
 }
 
-Uint32 gamelogic(Uint32 interval, void* param)
-{
-	
-	return interval;
-}

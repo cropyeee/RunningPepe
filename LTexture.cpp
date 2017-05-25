@@ -9,7 +9,7 @@ LTexture::LTexture()
 
 
 
-void LTexture::setX(int _posX)
+void LTexture::setX(double _posX)
 {
 	posX = _posX;
 }
@@ -19,7 +19,7 @@ void LTexture::moveX(int dx)
 	posX = posX + dx;
 }
 
-LTexture::LTexture(int _posX, int _posY)
+LTexture::LTexture(double _posX, double _posY)
 {
 	posX = _posX;
 	posY = _posY;
@@ -31,12 +31,12 @@ LTexture::~LTexture()
 	free();
 }
 
-int LTexture::getX()
+double LTexture::getX()
 {
 	return posX;
 }
 
-int LTexture::getY()
+double LTexture::getY()
 {
 	return posY;
 }
@@ -84,9 +84,10 @@ void LTexture::free()
 	}
 }
 
-void LTexture::render(int x, int y, Scena &scena)
+void LTexture::render(Scena &scena)
 {
-	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
+	SDL_Rect renderQuad = { posX, posY, mWidth, mHeight };
+	Collider = renderQuad;
 	SDL_RenderCopy(scena.returnRenderer(), mTexture, NULL, &renderQuad);
 }
 
@@ -105,9 +106,38 @@ SDL_Texture* LTexture::getTexture()
 	return mTexture;
 }
 
-void LTexture::movePolice(int time)
+Uint32 LTexture::PoliceMove(Uint32 interval, void*param)
 {
-	posX = posX - 1;
-	if (posX < (-mWidth))
+	LTexture*self = reinterpret_cast<LTexture *>(param);
+	self->movePolice();
+	SDL_TimerID timerID = SDL_AddTimer(60, PoliceMove, self);
+	return interval;
+}
+
+void LTexture::movePolice()
+{
+	
+		if (posX < (-mWidth))
 		posX = 1200;
+		if (SDL_GetTicks()<8000)
+			posX = posX - 0.2;
+		if (SDL_GetTicks() < 11000&&SDL_GetTicks()>=8000)
+			posX = posX - 0.3;
+		if (SDL_GetTicks() < 14000&&SDL_GetTicks()>=11000)
+			posX = posX - 0.4;
+		if(SDL_GetTicks()>=14000)
+			posX = posX - 0.0001*SDL_GetTicks();
+		
+}
+
+SDL_Rect* LTexture::getCollider()
+{
+	return &Collider;
+}
+
+void LTexture::moveBackground()
+{
+	posX -= 0.1;
+	if (posX < -mWidth)
+		posX = 1280;
 }

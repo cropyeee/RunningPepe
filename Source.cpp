@@ -5,38 +5,13 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <ctime>
 #include "Scena.h"
-#include "LTexture.h"
-#include "cClouds.h"
-#include "cCharacter.h"
 #include "Funkcje.h"
+//#include "LTexture.h"
+//#include "cClouds.h"
+//#include "cCharacter.h"
 
-/*SDL_Texture* loadTexture(std::string path)
-{
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-	}
-	else
-	{
-		//Create texture from surface pixels
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL)
-		{
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return newTexture;
-}*/
 
 
 int main(int argc, char* args[])
@@ -44,7 +19,8 @@ int main(int argc, char* args[])
 	//Creating models;
 	Scena scena;
 	cCharacter character(0, 470);
-	LTexture background;
+	LTexture background(0,0);
+	LTexture background2(1280,0);
 	LTexture police(1120, 530);
 	cClouds cloud(1000, 100);
 	
@@ -56,71 +32,73 @@ int main(int argc, char* args[])
 	else
 	{
 		
-		if (!loadMedia(scena,background,police,character,cloud)) //Load media
+		if (!loadMedia(scena,background,police,character,cloud,background2)) //Load media
 		{
 			std::cout << "Failed to load media!" << std::endl;
 		}
 		else
 		{
-			cClouds cloud1(600, 120,*cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
-			cClouds cloud2(205, 49, *cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
-			/*std::vector<cClouds> vecClouds;
-			vecClouds.push_back(cloud);
+			
+			cClouds *cloud1 = new cClouds(600, 120,cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
+			cClouds *cloud2=new cClouds(205, 49, cloud.getTexture(),cloud.getWidth(),cloud.getHeight());
+			cClouds *cloud3=new cClouds(1301, 30, cloud.getTexture(), cloud.getWidth(), cloud.getHeight());
+			cClouds *cloud4 = new cClouds(1000, 100, cloud.getTexture(), cloud.getWidth(), cloud.getHeight());
+			std::vector<cClouds*> vecClouds;
 			vecClouds.push_back(cloud1);
-			vecClouds.push_back(cloud2);*/
+			vecClouds.push_back(cloud2);
+			vecClouds.push_back(cloud3);
+			vecClouds.push_back(cloud4);
 			bool quit = false; //Main loop flag
+			scena.gamelogic();//game logic
 			SDL_Event e; //Event handler
-			/*SDL_TimerID timerID = SDL_AddTimer(5, cClouds::movingClouds, &cloud);
-			SDL_TimerID timerID1 = SDL_AddTimer(5, cClouds::movingClouds, &cloud1);
-			SDL_TimerID timerID2 = SDL_AddTimer(5, cClouds::movingClouds, &cloud2);*/
 			while (!quit) // while application is running
 			{
+				
 				while (SDL_PollEvent(&e) != 0)
 				{
-					if (e.type == SDL_QUIT)
+				if (e.type == SDL_QUIT)
 					{
 						quit = true;
 					}
-					else if (e.type == SDL_KEYDOWN)
-					{
-						switch (e.key.keysym.sym)
-						{
-						case SDLK_SPACE:
-						{
-							character.jump();
-							std::cout << SDL_GetTicks() << std::endl;
-							break;
-						}
-						}
-					}
+					character.handleEvent(e); //klikniecie spacji
 				}
 
+				//Moving objects//
+				character.jump();
 
-				police.movePolice(SDL_GetTicks());
-				//Clear screen
+				background.moveBackground();
+				background2.moveBackground();
+				police.movePolice();
+				for (auto c : vecClouds)
+					c->MoveClouds();
+				//Collision detection//
+				if (SDL_HasIntersection(character.getCollider(), police.getCollider()))
+					std::cout << "Kolizja" << std::endl;
+				//Start renderning//
 				SDL_SetRenderDrawColor(scena.returnRenderer(), 0xFF, 0xFF, 0xFF, 0xFF);
 				SDL_RenderClear(scena.returnRenderer());
-
-				background.render(0, 0,scena);
-				cloud.render(cloud.getX(), cloud.getY(),scena);
-				cloud1.render(cloud1.getX(), cloud1.getY(),scena);
-				cloud2.render(cloud2.getX(), cloud2.getY(),scena);
-				//renderowanie z wektora [!]
-				/*for (std::vector<cClouds>::iterator it = vecClouds.begin(); it != vecClouds.end(); it++)
+				background.render(scena);
+				background2.render(scena);
+				for (auto c:vecClouds)
 				{
-					it->render(it->getX(), it->getY(), scena);
-				}*/ 
-
-				
-				character.render(character.getX(), character.getY(),scena);
-				police.render(police.getX(), police.getY(),scena);
+					c->render(scena);
+				} 
+				character.render(scena);
+				police.render(scena);
 				SDL_RenderPresent(scena.returnRenderer());
-
 			}
-			/*SDL_RemoveTimer(timerID);
-			SDL_RemoveTimer(timerID1);*/
+			
+			for (int i = 0; i < vecClouds.size(); i++)
+				delete vecClouds[i];
 		}
 	}
-	close(scena,background,police,character,cloud);
+	close(scena,background,police,character,cloud,background2);
 	return 0;
 }
+
+
+
+// 1)Po dodaniu do wektora nie dzialaja funkcje
+// 2)Przekazanie dodatkowych parametrów do callbacka (ogólnie gamelogic w SDL)
+// 3)Problem ze skokiem(dziala tylko raz, stworzenie chwilowego zawisniecia)
+// 4)Dlaczego samochod dziwnie przyspiesza

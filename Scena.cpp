@@ -53,3 +53,8 @@ int Scena::returnScreenWidth()
 {
 	return SCREEN_WIDTH;
 }
+
+void Scena::gamelogic()
+{
+	
+}
